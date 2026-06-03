@@ -15,6 +15,8 @@ you normally never edit Python. Copy `.env.example` to `.env` and fill it in.
 | `TM_SERVER_NAME` | dedicated | Public name in the server browser. Supports `$` color/style codes. |
 | `XMLRPC_SUPERADMIN` | dedicated + controller | Password the controller logs in with. Pick a strong value. |
 | `XMLRPC_ADMIN` / `XMLRPC_USER` | dedicated | Lower-privilege XML-RPC passwords. |
+| `TM_SERVER_MAX_PLAYERS` | dedicated | Player slots (default 32). |
+| `TM_SERVER_MAX_SPECTATORS` | dedicated | Spectator slots (default 32). Separate pool from players. |
 | `TM_UPLOADRATE` / `TM_DOWNLOADRATE` | dedicated | Bandwidth in kbit/s. Raise for many players/spectators. |
 | `PYPLANET_OWNERS` | controller | Comma-separated player logins that become owners (full admin). |
 | `MAP_MATCHSETTINGS` | controller | MatchSettings file the controller manages. **Must match the file the dedicated loads** (the evoesports image uses `default.txt`). |
@@ -49,10 +51,33 @@ image). Most day-to-day tuning is done live in-game via `//settings` and
 `//modesettings` instead, so you rarely need to touch these files. If you do,
 edit them in the repo, push, and redeploy the stack.
 
+## Does it survive a reboot? (persistence)
+
+Yes. You do **not** redo setup after a restart or host reboot. State lives in
+two Docker volumes that outlive the containers:
+
+- **`dbdata`** (MariaDB) holds everything PyPlanet stores: local records, karma,
+  player admin levels, server rankings, cup data, and all `//settings` values.
+  So any setting you change via `//settings` persists automatically.
+- **`userdata`** (shared with the dedicated) holds the maps, MatchSettings,
+  blacklist, and the dedicated's config files.
+
+The dedicated's server config (name, passwords, slots, bandwidth) is re-applied
+from your **environment variables** on every start, so those persist too.
+
+The **one** thing that does not persist is a setting changed *live over XML-RPC*
+that isn't backed by an env var, for example `//setmaxplayers`. Those revert to
+the configured value on restart. That's exactly why server-config settings
+should be set via env (e.g. `TM_SERVER_MAX_PLAYERS`) rather than a live command:
+set it in the env and it's permanent.
+
+Removing the volumes (e.g. `docker compose down -v`) is the only thing that
+wipes the database and maps, so avoid `-v` unless you really mean it.
+
 ## Updating
 
-- **Controller / plugins:** edit the repo, push, redeploy the stack (Portainer
-  re-clones and rebuilds).
+- **Controller / plugins:** edit the repo, push; CI republishes the image; pull
+  it and redeploy the stack.
 - **Dedicated server:** `docker compose pull dedicated && docker compose up -d`.
 - Restarting the **controller** is safe and does not disconnect players.
   Restarting the **dedicated** kicks everyone, so avoid it during events.
