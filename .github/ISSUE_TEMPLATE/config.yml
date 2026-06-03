@@ -1,0 +1,13 @@
+# The issue chooser. The contact links route upstream bugs to the right project
+# before someone files them here.
+blank_issues_enabled: true
+contact_links:
+  - name: PyPlanet core / bundled-app bug
+    url: https://github.com/PyPlanet/PyPlanet/issues
+    about: Bugs in PyPlanet itself (not specific to this Python 3.12 packaging) belong upstream.
+  - name: cup_manager plugin bug
+    url: https://github.com/skybaks/pyplanet-cup_manager/issues
+    about: Issues with the cup_manager plugin belong on skybaks' repository.
+  - name: Trackmania dedicated server image
+    url: https://github.com/EvoEsports/docker-trackmania/issues
+    about: Issues with the dedicated server image / entrypoint belong on the evoesports repo. The server binary itself is Nadeo's.
