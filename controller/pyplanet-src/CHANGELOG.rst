@@ -1,6 +1,44 @@
 Changelog
 =========
 
+0.12.0
+------
+
+Modernized fork. The controller (core + bundled apps) now runs on current
+Python (3.11 to 3.13, built and run on 3.12). This is a fork-local release and
+not an official PyPlanet version.
+
+Core
+~~~~
+
+* **Breaking (dependencies)**: migrated off the end-of-life Python 3.8 stack
+  (upstream #1370). ``peewee`` 2.10 to 4.x and ``peewee-async`` 0.5 to 2.x: the
+  ``Manager`` API was removed, so the ``Model`` facade is rebuilt on
+  ``peewee_async.AioModel`` and the ``aio_*`` methods while keeping the existing
+  call signatures. ``aiohttp`` to 3.10+, ``Jinja2`` to 3.x. Dropped end-of-life
+  dependencies ``raven``, ``cached-property``, ``async_generator`` and
+  ``asyncio_extras``.
+* Python 3.10+ correctness: removed the dropped ``asyncio.open_connection(loop=...)``,
+  ``collections.abc`` fixes, ``distutils`` to ``sysconfig``, raw-string regex for
+  invalid escape sequences, and lazy ``aiohttp.CookieJar`` creation.
+* Background tasks: fire-and-forget ``ensure_future`` calls now go through a
+  ``run_detached`` helper that keeps a strong reference and logs exceptions
+  instead of silently dropping them.
+* Resilience: a player disconnecting right at a scores event no longer voids the
+  whole round's results, and ``map_loaded`` reconciles the online player set each
+  map to self-heal ghost or missing players.
+
+Apps
+~~~~
+
+* Bugfix: Jukebox advances the queue on ``map.map_end`` instead of
+  ``flow.podium_start`` (#1278), so a queued map is no longer skipped in modes
+  with a podium or left unloaded in modes without one.
+* Improvement: MX/TMX map search result cap raised (#902).
+* Settings: the core widget logo and the report-issue overlay are now toggle
+  settings (default off) instead of hardcoded; the clock widget is toggleable.
+* Cosmetic: dark "glass" menus and HUD widgets with a teal accent line.
+
 0.11.12
 -------
 

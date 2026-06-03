@@ -105,12 +105,23 @@ Maps and MatchSettings live in the shared `userdata` volume under
 
 ## Notes on the Python 3.12 fork
 
-The migration keeps PyPlanet's public APIs intact, so stock contrib apps and
-third-party plugins work unchanged after a small peewee-4 pass. Highlights:
+The migration keeps PyPlanet's controller interfaces (signals, chat, commands,
+UI/views, settings, permissions) intact, so a plugin's main logic keeps working
+as-is. The one layer that changed underneath is the database (peewee 2 to 4,
+peewee-async 0.5 to 2). In practice:
 
-- ORM rebuilt on `peewee_async.AioModel` + the `aio_*` methods, same call sites.
-- Jukebox advances on `map_end` instead of `podium_start` (fixes skipped/again-
-  loaded maps in modes with or without a podium).
+- A plugin that does **not** touch the database usually needs **no changes**.
+- A plugin that defines its own database models or queries needs a **small
+  peewee 4 pass**. For `cup_manager` that was only a few lines (a renamed
+  table-name option, null-safe player fields, and a regex string fix), not a
+  rewrite.
+
+So third-party plugins are not "ported" in the rewrite sense; at most they get a
+small database-layer update, and often nothing. Other highlights:
+
+- ORM rebuilt on `peewee_async.AioModel` + the `aio_*` methods, same call signatures.
+- Jukebox advances on `map_end` instead of `podium_start` (fixes skipped or
+  reloaded maps in modes with or without a podium).
 - Map search result cap raised, plus assorted resilience fixes.
 
 See `controller/pyplanet-src/CHANGELOG.rst` and the commit history for details.

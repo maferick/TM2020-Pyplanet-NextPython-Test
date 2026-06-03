@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏁 PyPlanet · vdlaken fork
+# 🏁 PyPlanet (Python 3.12 fork)
 
 **A modernized fork of [PyPlanet](https://github.com/PyPlanet/PyPlanet), the async server controller for Trackmania (2020) and ManiaPlanet, brought up to Python 3.12.**
 
@@ -37,21 +37,12 @@ Upstream PyPlanet is pinned to the **end-of-life Python 3.8** stack (see upstrea
 
 ### 🎨 Cosmetic
 - Dark "glass" menus and HUD widgets (replacing the legacy beige panels), with a teal accent line.
-- Removed the bottom-right PyPlanet logo and the "report issue" overlay.
+- The PyPlanet logo, the "report issue" overlay, and the clock widget are now toggle settings (default off) instead of hardcoded.
 - Version bumped to **0.12.0**.
 
 ## 🎮 Running it
 
-This fork is built automatically and deployed alongside a dedicated server:
-
-```
-Gitea Actions  ──▶  registry.vdlaken.eu/pyplanet:latest  ──▶  Portainer stack "pyplanet-tm"
-                                                               ├── dedicated  (evoesports/trackmania, TM2020)
-                                                               ├── db         (MariaDB)
-                                                               └── pyplanet   (this image)
-```
-
-Configuration is env-driven (database, dedicated XML-RPC, owners) through a mounted `settings/base.py`, so no secrets live in the image. For general installation and configuration of vanilla PyPlanet, see the upstream docs at [pypla.net](http://pypla.net/).
+This is the controller source, vendored inside the [TM2020-Pyplanet-NextPython-Test](https://github.com/maferick/TM2020-Pyplanet-NextPython-Test) stack, which runs it in Docker alongside a Trackmania dedicated server and a database. Configuration is env-driven (database, dedicated XML-RPC, owners), so no secrets live in the image. For general installation and configuration of vanilla PyPlanet, see the upstream docs at [pypla.net](http://pypla.net/).
 
 ## 🧩 Plugins
 
@@ -62,7 +53,7 @@ Configuration is env-driven (database, dedicated XML-RPC, owners) through a moun
 - **PyPlanet** by Tom Valk and contributors, the original controller. http://pypla.net/
 - **cup_manager** by [skybaks](https://github.com/skybaks).
 
-This is a private fork for a self-hosted Trackmania server and is not affiliated with or endorsed by the upstream project.
+This is an independent fork and is not affiliated with or endorsed by the upstream project.
 
 ## 📄 License
 
