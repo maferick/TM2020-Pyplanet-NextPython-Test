@@ -1,0 +1,73 @@
+# Production / pull-only variant of the stack. Identical to docker-compose.yml
+# except the controller has NO build section, so it always PULLS the published
+# image from GHCR (ghcr.io/maferick/tm2020-pyplanet-controller) instead of
+# building from source. This is what the live deployment uses.
+#
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Use the default docker-compose.yml if you want to build the controller locally.
+name: tm2020-pyplanet
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME:-pyplanet}
+      MARIADB_USER: ${DB_USER:-pyplanet}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+
+  dedicated:
+    image: evoesports/trackmania:latest
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      TM_MASTERSERVER_LOGIN: ${TM_MASTERSERVER_LOGIN}
+      TM_MASTERSERVER_PASSWORD: ${TM_MASTERSERVER_PASSWORD}
+      TM_SERVER_NAME: ${TM_SERVER_NAME:-PyPlanet TM2020 Server}
+      TM_SYSTEM_XMLRPC_ALLOWREMOTE: "True"
+      TM_AUTHORIZATION_SUPERADMIN_PASSWORD: ${XMLRPC_SUPERADMIN}
+      TM_AUTHORIZATION_ADMIN_PASSWORD: ${XMLRPC_ADMIN}
+      TM_AUTHORIZATION_USER_PASSWORD: ${XMLRPC_USER}
+      TM_SYSTEM_CONNECTION_UPLOADRATE: ${TM_UPLOADRATE:-30000}
+      TM_SYSTEM_CONNECTION_DOWNLOADRATE: ${TM_DOWNLOADRATE:-30000}
+    ports:
+      - "2350:2350/tcp"
+      - "2350:2350/udp"
+    volumes:
+      - userdata:/server/UserData
+
+  controller:
+    image: ghcr.io/maferick/tm2020-pyplanet-controller:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      dedicated:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-pyplanet}
+      DB_USER: ${DB_USER:-pyplanet}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DEDICATED_HOST: dedicated
+      DEDICATED_PORT: "5000"
+      DEDICATED_PASSWORD: ${XMLRPC_SUPERADMIN}
+      PYPLANET_OWNERS: ${PYPLANET_OWNERS}
+      MAP_MATCHSETTINGS: ${MAP_MATCHSETTINGS:-maplist.txt}
+    volumes:
+      - userdata:/server/UserData
+
+volumes:
+  dbdata:
+  userdata:
