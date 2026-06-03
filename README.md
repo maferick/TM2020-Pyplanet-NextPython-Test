@@ -69,13 +69,17 @@ Three containers:
    # edit .env: dedicated account, XML-RPC passwords, your owner login
    ```
 
-3. **Bring it up.**
+3. **Bring it up.** The controller image is published to GHCR by CI, so you can
+   just pull it (fast, no local build):
+   ```bash
+   docker compose pull && docker compose up -d
+   ```
+   Or build the controller from source instead (no registry needed):
    ```bash
    docker compose up -d --build
    ```
-   First build compiles the controller image (a few minutes). The controller
-   waits for the database and the dedicated server, then runs its migrations and
-   connects.
+   The controller waits for the database and the dedicated server, then runs its
+   migrations and connects.
 
 4. **Find it in game.** Trackmania > Play > Local / LAN or the server browser,
    under the `TM_SERVER_NAME` you set.
@@ -89,7 +93,8 @@ Three containers:
 ```bash
 docker compose logs -f controller     # watch the controller
 docker compose restart controller     # safe: reconnects, does NOT kick players
-docker compose pull dedicated && docker compose up -d   # update the server image
+docker compose pull controller && docker compose up -d  # update controller to the latest CI build
+docker compose pull dedicated && docker compose up -d   # update the dedicated server image
 ```
 
 > Restarting **controller** is safe and does not disconnect anyone. Restarting
