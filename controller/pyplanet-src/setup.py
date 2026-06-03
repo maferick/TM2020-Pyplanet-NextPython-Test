@@ -46,9 +46,7 @@ setup(
 		'pyplanet/tests': ['pyplanet/tests/**.txt', 'pyplanet/tests/**.json', 'pyplanet/tests/**.xml', 'pyplanet/tests/**.j2']
 	},
 	install_requires=read_requirements('requirements.txt'),
-	tests_require=read_requirements('requirements-dev.txt'),
 	extras_require={},
-	test_suite='tests',
 	include_package_data=True,
 	python_requires='>=3.11',
 
