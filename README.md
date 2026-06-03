@@ -94,6 +94,16 @@ docker compose pull dedicated && docker compose up -d   # update the server imag
 > Restarting **controller** is safe and does not disconnect anyone. Restarting
 > **dedicated** kicks everyone, so avoid it during events.
 
+## Documentation
+
+Self-contained docs live in [`docs/`](docs/):
+
+- **[docs/commands.md](docs/commands.md)** — in-game chat commands (player and admin).
+- **[docs/configuration.md](docs/configuration.md)** — env vars, owners/admin levels, maps, updating.
+- **[docs/features.md](docs/features.md)** — what each bundled app/plugin does (and what auto-unloads on TM2020).
+
+In game, `/help` and `//help` always print the live command list for your server.
+
 ## Configuration
 
 All configuration is environment driven via `.env` (see `.env.example` for the
