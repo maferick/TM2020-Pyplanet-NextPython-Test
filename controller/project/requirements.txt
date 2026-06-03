@@ -1,0 +1,2 @@
+# PyPlanet itself is installed from the vendored ../pyplanet-src in the Dockerfile.
+# Add any extra plugin runtime dependencies here. cup_manager needs nothing extra.

@@ -1,0 +1,29 @@
+# Base
+colorlog>=6.8
+
+# Templating
+Jinja2>=3.1
+
+# DB/Storage
+peewee==4.0.6
+peewee-async==2.0.0
+aiomysql>=0.2.0
+pymysql>=1.1
+aiofiles>=23.2
+asyncssh>=2.14
+
+# Network
+aiohttp>=3.10
+async-timeout>=4.0
+requests>=2.31
+urllib3>=2.0
+
+# Utils
+watchdog>=4.0
+bcrypt>=4.0
+xmltodict>=0.13
+PyYAML>=6.0
+packaging>=23.1
+tinytag>=2.0
+
+cryptography>=43.0

@@ -1,0 +1,10 @@
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.git/
+**/.gitea/
+**/.github/
+pyplanet-src/docs/
+pyplanet-src/tests/
+pyplanet-src/env/
+pyplanet-src/tmp/

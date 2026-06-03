@@ -1,0 +1,13 @@
+# Secrets / local config
+.env
+*.env
+!.env.example
+
+# Python caches
+**/__pycache__/
+*.py[cod]
+
+# Runtime data (server UserData, tmp)
+userdata/
+tmp/
+controller/pyplanet-src/tmp/

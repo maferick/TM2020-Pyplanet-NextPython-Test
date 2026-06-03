@@ -1,0 +1,81 @@
+# Trackmania 2020 dedicated server + PyPlanet controller (Python 3.12 fork)
+# + MariaDB, in one Compose project. Copy .env.example to .env, fill it in,
+# then:  docker compose up -d --build
+name: tm2020-pyplanet
+
+services:
+  # --- Database for the PyPlanet controller ---
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME:-pyplanet}
+      MARIADB_USER: ${DB_USER:-pyplanet}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+
+  # --- Official Nadeo dedicated server (evoesports image) ---
+  dedicated:
+    image: evoesports/trackmania:latest
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      TM_MASTERSERVER_LOGIN: ${TM_MASTERSERVER_LOGIN}
+      TM_MASTERSERVER_PASSWORD: ${TM_MASTERSERVER_PASSWORD}
+      TM_SERVER_NAME: ${TM_SERVER_NAME:-PyPlanet TM2020 Server}
+      TM_SYSTEM_XMLRPC_ALLOWREMOTE: "True"
+      TM_AUTHORIZATION_SUPERADMIN_PASSWORD: ${XMLRPC_SUPERADMIN}
+      TM_AUTHORIZATION_ADMIN_PASSWORD: ${XMLRPC_ADMIN}
+      TM_AUTHORIZATION_USER_PASSWORD: ${XMLRPC_USER}
+      # Bandwidth: raise for many players/spectators (server upload is the lever).
+      TM_SYSTEM_CONNECTION_UPLOADRATE: ${TM_UPLOADRATE:-30000}
+      TM_SYSTEM_CONNECTION_DOWNLOADRATE: ${TM_DOWNLOADRATE:-30000}
+    ports:
+      - "2350:2350/tcp"
+      - "2350:2350/udp"
+    volumes:
+      - userdata:/server/UserData
+    # Reserve resources so the game sim is never starved on a busy host.
+    # Uncomment and tune to your machine if you want hard guarantees.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       cpus: "1.0"
+    #       memory: 512M
+
+  # --- PyPlanet controller (our Python 3.12 fork + cup_manager) ---
+  controller:
+    build:
+      context: ./controller
+    image: tm2020-pyplanet-controller:local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      dedicated:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-pyplanet}
+      DB_USER: ${DB_USER:-pyplanet}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DEDICATED_HOST: dedicated
+      DEDICATED_PORT: "5000"
+      DEDICATED_PASSWORD: ${XMLRPC_SUPERADMIN}
+      PYPLANET_OWNERS: ${PYPLANET_OWNERS}
+      MAP_MATCHSETTINGS: ${MAP_MATCHSETTINGS:-maplist.txt}
+    volumes:
+      # Shared with the dedicated server so the controller can read MatchSettings/maps.
+      - userdata:/server/UserData
+
+volumes:
+  dbdata:
+  userdata:
