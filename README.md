@@ -100,6 +100,18 @@ docker compose pull dedicated && docker compose up -d   # update the dedicated s
 > Restarting **controller** is safe and does not disconnect anyone. Restarting
 > **dedicated** kicks everyone, so avoid it during events.
 
+### Pull-only deployment
+
+`docker-compose.yml` keeps a `build:` section so you can build the controller
+locally. For a server that should always run the published image and never
+build (the way the live deployment runs), use **`docker-compose.prod.yml`**,
+which is identical but has no build section:
+
+```bash
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
+```
+
 ## Documentation
 
 Self-contained docs live in [`docs/`](docs/):
