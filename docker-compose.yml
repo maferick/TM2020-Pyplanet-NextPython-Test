@@ -53,9 +53,12 @@ services:
 
   # --- PyPlanet controller (our Python 3.12 fork + cup_manager) ---
   controller:
+    # Prebuilt image from GitHub Actions (ghcr.io). `build` is kept as a local
+    # fallback: `docker compose up -d --build` builds from source instead.
+    # To use the published image: `docker compose pull && docker compose up -d`.
+    image: ghcr.io/maferick/tm2020-pyplanet-controller:latest
     build:
       context: ./controller
-    image: tm2020-pyplanet-controller:local
     restart: unless-stopped
     depends_on:
       db:

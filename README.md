@@ -8,6 +8,7 @@ the official Nadeo dedicated server + a **modernized, Python 3.12** build of
 [cup_manager](https://github.com/skybaks/pyplanet-cup_manager) plugin, wired
 together with MariaDB.
 
+[![build-controller](https://github.com/maferick/TM2020-Pyplanet-NextPython-Test/actions/workflows/build.yml/badge.svg)](https://github.com/maferick/TM2020-Pyplanet-NextPython-Test/actions/workflows/build.yml)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/license-GPLv3-green)
